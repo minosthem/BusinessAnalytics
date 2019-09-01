@@ -1,5 +1,8 @@
 library(cluster)
 library(lars)
+library(glmnet)
+library(leaps)
+library(Matrix)
 
 raw <- read.csv("C:/Users/Konstantinos/Desktop/Tilburg University/Decision Making with Business Analytics/Homeworks/Labs/Lab1/unempstatesChanges.csv")
 
@@ -133,6 +136,12 @@ for (i in c(1:16)) {
 colnames(xfinal1)<-names
 
 ## Question v
+lasso_predictions=list()
+for (i in c(1:4)){
+  lasso1=cv.glmnet(xFinal, yTables[[i]], alpha=1, lambda=c(0.01, 0.1, 1, 10), thresh=1e-12)
+  lasso.pred = predict(lasso1, newx=xFinal, s=c(0.01, 0.1, 1, 10))
+  lasso_predictions[[i]]=lasso.pred
+}
 
 
 
