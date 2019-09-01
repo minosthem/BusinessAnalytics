@@ -1,7 +1,7 @@
 library(cluster)
 library(lars)
 
-raw <- read.csv("C:/Users/Konstantinos/Desktop/Tilburg University/Decision Making with Business Analytics/Lab1/unempstatesChanges.csv")
+raw <- read.csv("C:/Users/Konstantinos/Desktop/Tilburg University/Decision Making with Business Analytics/Homeworks/Labs/Lab1/unempstatesChanges.csv")
 
 rawt=matrix(nrow=50,ncol=416)
 rawt=t(raw)
@@ -12,7 +12,7 @@ grpunemp <- kmeans(rawt, centers=2, nstart=10)
 sort(grpunemp$cluster)
 
 ## load data set unemp.csv
-unemp <- read.csv("C:/Users/Konstantinos/Desktop/Tilburg University/Decision Making with Business Analytics/Lab1/unemp.csv")
+unemp <- read.csv("C:/Users/Konstantinos/Desktop/Tilburg University/Decision Making with Business Analytics/Homeworks/Labs/Lab1/unemp.csv")
 
 ## list of cluster assignments
 o=order(grpunemp$cluster)
@@ -115,8 +115,24 @@ trained = lm(yTables[[1]]~., data=data.frame(xFinal))
 
 ## Question iv
 
+for (i in c(1:4)){
+  if (i==1){
+    xfinal1=xVars[[i]]
+  }else{
+    xfinal1=cbind(xfinal1, xVars[[i]])
+  }
+}
 
+names = list()
+j = 1
+for (i in c(1:16)) {
+  name = paste0("X", i)
+  names[[i]] <- name 
+  
+}
+colnames(xfinal1)<-names
 
+## Question v
 
 
 
