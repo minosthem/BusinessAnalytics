@@ -3,6 +3,7 @@ library(lars)
 library(glmnet)
 library(leaps)
 library(Matrix)
+library(RandPro)
 
 raw <- read.csv("C:/Users/Konstantinos/Desktop/Tilburg University/Decision Making with Business Analytics/Homeworks/Labs/Lab1/unempstatesChanges.csv")
 
@@ -142,6 +143,70 @@ for (i in c(1:4)){
   lasso.pred = predict(lasso1, newx=xFinal, s=c(0.01, 0.1, 1, 10))
   lasso_predictions[[i]]=lasso.pred
 }
+
+## Question vi
+
+total_no_cols = c(1:200)
+sample_indices = sample(total_no_cols,20)
+
+new_dataset = data.frame(xFinal)
+
+new_dataset <- new_dataset[sample_indices]
+
+rand_projt=list()
+
+for (i in c(1:4)){
+  rand_proj = lm(yTables[[i]]~., data=data.frame(new_dataset))
+  rand_projt[[i]]=rand_proj
+}
+
+## Questions 1-6
+final_dataset = xFinal
+for (i in c(1:4)) {
+  final_dataset = data.frame(cbind(final_dataset, yTables[[i]]))
+}
+
+colnames(final_dataset)[ncol(final_dataset) - 3] <- "Y1"
+colnames(final_dataset)[ncol(final_dataset) - 2] <- "Y2"
+colnames(final_dataset)[ncol(final_dataset) - 1] <- "Y3"
+colnames(final_dataset)[ncol(final_dataset)] <- "Y4"
+
+train_df = data.frame(final_dataset[1:362,])
+test_df = data.frame(final_dataset[362:411,])
+
+#linear regression
+lm_list=list()
+lasso_list=list()
+for (i in c(1:4)){
+  lm.fit=lm(yTables[[i]]~., data=train_df)
+  listcoeflm[[i]]=lm.fit
+  lm.pred=predict(lm.fit, test_df)
+  lm_list[[i]]=lm.pred
+  
+  #lasso
+  train.mat = model.matrix(yTables[[i]]~., data=train_df)
+  test.mat = model.matrix(yTables[[i]]~., data=test_df)
+  mod.lasso = cv.glmnet(train.mat, train_df[, yTables[[i]]], alpha=1, lambda=grid, thresh=1e-12)
+  lambda.best = mod.lasso$lambda.min
+  lasso.pred = predict(mod.lasso, newx=test.mat, s=lambda.best)
+  lasso_list[[i]]=lasso.pred
+}
+
+
+
+#lasso
+train.mat = model.matrix(Wage~., data=traindf)
+test.mat = model.matrix(Wage~., data=testdf)
+mod.lasso = cv.glmnet(train.mat, traindf[, "Wage"], alpha=1, lambda=grid, thresh=1e-12)
+lambda.best = mod.lasso$lambda.min
+lasso.pred = predict(mod.lasso, newx=test.mat, s=lambda.best)
+testerror.lasso=mean((testdf[, "Wage"] - lasso.pred)^2)
+
+mod.lasso = glmnet(model.matrix(Wage~., data=df), df[, "Wage"], alpha=1)
+coef.lasso=predict(mod.lasso, s=lambda.best, type="coefficients")
+listcoeflasso[[i]]=coef.lasso
+length(which(coef.lasso[-(1:2),]!=0))
+listerrorlasso[[i]]=testerror.lasso
 
 
 
